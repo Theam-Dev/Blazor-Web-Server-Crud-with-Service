@@ -1,0 +1,62 @@
+﻿@page "/post"
+
+@using BlazorApp.Model;
+@using BlazorApp.Service;
+@using static BlazorApp.Service.PostServices;
+<h1>Post</h1>
+<NavLink class="btn btn-primary" href="post/create">
+    Create
+</NavLink>
+@if (post == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in post)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Title</td>
+                    <td>@item.Description</td>
+                    <td>
+                        <NavLink href="@($"/post/edit/{item.Id}")" class="btn btn-info btn-sm">Edit</NavLink>
+                        <button class="btn btn-danger btn-sm" @onclick="@(() => Delete(item.Id))">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<div>
+</div>
+@code {
+
+    IEnumerable<Post> post;
+    [Inject]
+    protected IPostService postService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetData();
+    }
+    private async Task GetData()
+    {
+        post = await postService.Get();
+    }
+    async Task Delete(int Id)
+    {
+        await postService.Delete(Id);
+        await OnInitializedAsync();
+    }
+}

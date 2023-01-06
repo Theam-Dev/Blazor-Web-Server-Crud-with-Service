@@ -1,0 +1,33 @@
+﻿@page "/post/create"
+@inject NavigationManager uriHelper
+@using BlazorApp.Model;
+@using static BlazorApp.Service.PostServices;
+<h3>Create</h3>
+<EditForm Model="@datas" OnValidSubmit="@SaveData">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Title :</label>
+        <input type="text" class="form-control" @bind-value="@datas.Title" placeholder="Title">
+        <ValidationMessage For="@(() => datas.Title)" />
+    </div>
+    <div class="form-group">
+        <label>Body :</label>
+        <input type="text" class="form-control" @bind-value="@datas.Description" placeholder="Desc">
+        <ValidationMessage For="@(() => datas.Description)" />
+    </div>
+    <p></p>
+    <button type="submit" class="btn btn-success">
+        Create
+    </button>
+</EditForm>
+@code {
+    public Post datas = new Post();
+    [Inject]
+    protected IPostService postService { get; set; }
+    public EventCallback OnValidSubmit { get; set; }
+    protected async Task SaveData()
+    {
+        await postService.Add(datas);
+        uriHelper.NavigateTo("post");
+    }
+}
